@@ -22,9 +22,15 @@ import json
 import re
 import threading
 
+# TODO: Delete
+# from containerregistry.client import docker_creds_ as docker_creds
+# from containerregistry.client import docker_name_ as docker_name
+# from containerregistry.client.v2_2 import docker_creds_ as v2_2_creds
+
 from containerregistry.client import docker_creds
 from containerregistry.client import docker_name
 from containerregistry.client.v2_2 import docker_creds as v2_2_creds
+
 import httplib2
 import six.moves.http_client
 import six.moves.urllib.parse
@@ -224,12 +230,16 @@ class Transport(object):
         'content-type': 'application/json',
         'user-agent': docker_name.USER_AGENT,
     }
+
+    print('Pinging to address {scheme}://{registry}/v2/ '.format(scheme=Scheme(self._name.registry), registry=self._name.registry))
+    print('Docker user agent: {agent}'.format(agent=docker_name.USER_AGENT))
     resp, content = self._transport.request(
         '{scheme}://{registry}/v2/'.format(
             scheme=Scheme(self._name.registry), registry=self._name.registry),
         'GET',
         body=None,
         headers=headers)
+    print("rezp: {resp}; content: {content}".format(resp=resp, content=content))
 
     # We expect a www-authenticate challenge.
     _CheckState(
@@ -301,6 +311,7 @@ class Transport(object):
         'scope': self._Scope(),
         'service': self._service,
     }
+    # print('Refreshing token. Url: {}, headers: {}'.format('{realm}?{query}'.format(realm=self._realm, query=six.moves.urllib.parse.urlencode(parameters)), headers))
     resp, content = self._transport.request(
         # 'realm' includes scheme and path
         '{realm}?{query}'.format(
@@ -309,6 +320,7 @@ class Transport(object):
         'GET',
         body=None,
         headers=headers)
+    # print('Response: {}; {}'.format(resp, content))
 
     if resp.status != six.moves.http_client.OK:
       raise TokenRefreshException('Bad status during token exchange: %d\n%s' %
@@ -323,6 +335,8 @@ class Transport(object):
     wrapper_object = json.loads(content)
     token = wrapper_object.get('token') or wrapper_object.get('access_token')
     _CheckState(token is not None, 'Malformed JSON response: %s' % content)
+    # print('TOKEN: {}'.format(token))
+    print('Got the token')
 
     with self._lock:
       # We have successfully reauthenticated.
@@ -382,8 +396,11 @@ class Transport(object):
       if method in ('POST', 'PUT') and not body:
         headers['content-length'] = '0'
 
+      # print('Requesting {}:\nbody: {}\nheaders: {}'.format(url, body, headers))
       resp, content = self._transport.request(
           url, method, body=body, headers=headers)
+      # print('Response: {}; {}'.format(resp, content)
+      print("Got the response")
 
       if resp.status != six.moves.http_client.UNAUTHORIZED:
         break

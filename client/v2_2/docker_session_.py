@@ -21,6 +21,14 @@ from __future__ import print_function
 import logging
 import concurrent.futures
 
+# TODO: Delete
+# from containerregistry.client import docker_creds_ as docker_creds
+# from containerregistry.client import docker_name_ as docker_name
+# from containerregistry.client.v2_2 import docker_http_ as docker_http
+# from containerregistry.client.v2_2 import docker_image_ as docker_image
+# from containerregistry.client.v2_2 import docker_image_list_ as image_list
+# import httplib2
+
 from containerregistry.client import docker_creds
 from containerregistry.client import docker_name
 from containerregistry.client.v2_2 import docker_http

@@ -27,10 +27,6 @@ import logging
 import os
 import subprocess
 
-from containerregistry.client import docker_name
-import httplib2
-from oauth2client import client as oauth2client
-
 import six
 
 
@@ -91,6 +87,21 @@ class Basic(SchemeProvider):
     u = self.username.encode('utf8')
     p = self.password.encode('utf8')
     return base64.b64encode(u + b':' + p).decode('utf8')
+
+
+class JWT(SchemeProvider):
+
+  def __init__(self, token):
+    super(JWT, self).__init__('Basic')
+    self._token = token
+
+  @property
+  def token(self):
+    return self._token
+
+  @property
+  def suffix(self):
+    return self.token
 
 
 _USERNAME = '_token'
@@ -277,10 +288,22 @@ class _DefaultKeychain(Keychain):
     for form in _FORMATS:
       if form % name.registry in auths:
         entry = auths[form % name.registry]
+        # if 'identitytoken' in entry:
+        #   decoded_auth = base64.b64decode(entry['auth']).decode('utf8')
+        #   username, password = decoded_auth.split(':', 1)
+        #   id_token = entry['identitytoken']
+        #   # return OAuth2({}, None)
+        #   return Basic('<token>', id_token)
         if 'auth' in entry:
           decoded = base64.b64decode(entry['auth']).decode('utf8')
-          username, password = decoded.split(':', 1)
-          return Basic(username, password)
+          # Check if its a user:pass pare
+          if ':' in decoded:
+            username, password = decoded.split(':', 1)
+            print("Basic auth {}".format(decoded))
+            return Basic(username, password)
+          # Else its probably a jwt
+          print("JWT auth {}".format(decoded))
+          return JWT(decoded)
         elif 'username' in entry and 'password' in entry:
           return Basic(entry['username'], entry['password'])
         else:

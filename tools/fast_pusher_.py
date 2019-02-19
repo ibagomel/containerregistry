@@ -26,6 +26,17 @@ import argparse
 import logging
 import sys
 
+# TODO: Delete
+# from containerregistry.client import docker_creds_ as docker_creds
+# from containerregistry.client import docker_name_ as docker_name
+# from containerregistry.client.v2_2 import docker_image_ as v2_2_image
+# from containerregistry.client.v2_2 import docker_session_ as docker_session
+# from containerregistry.client.v2_2 import oci_compat_ as oci_compat
+# from containerregistry.tools import logging_setup_ as logging_setup
+# from containerregistry.tools import patched_ as patched
+# from containerregistry.transport import retry_ as retry
+# from containerregistry.transport import transport_pool_
+
 from containerregistry.client import docker_creds
 from containerregistry.client import docker_name
 from containerregistry.client.v2_2 import docker_image as v2_2_image
